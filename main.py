@@ -186,11 +186,10 @@ while True:
     # Where mask ≈ 0 → use background (black)
     # Values in between create smooth edges
     isolated_me = (frame * mask_3d + background * (1 - mask_3d)).astype("uint8")
-    small_me = cv2.resize(isolated_me, (0, 0), fx=0.8, fy=0.8)
 
     h, w = frame.shape[:2]
-    final_output = frame.copy()
 
+    final_output = frame.copy()
     if jutsu_active:
         black_canvas = np.zeros_like(frame)
 
@@ -215,15 +214,12 @@ while True:
 
         # black_canvas = cv2.GaussianBlur(black_canvas, (7, 7), 0)
 
-        # Blend clones BEHIND original frame with controlled strength
-        final_output = frame.copy()
-
         # Paste clones directly (no fading)
         mask_clone = black_canvas > 0
         final_output[mask_clone] = black_canvas[mask_clone]
 
         # Real you on top
-        final_output = cv2.add(final_output, isolated_me)
+        final_output = (final_output * (1 - mask_3d) + isolated_me).astype("uint8")
 
     # ALWAYS show window
     # cv2.imshow("Segmentation", final_output)
